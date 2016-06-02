@@ -35,8 +35,8 @@ if(CMAKE_CXX_COMPILER MATCHES ".*clang")
   set(CMAKE_COMPILER_IS_CLANGXX 1)
   # call find_package for Threads. Without this, you will get this error:
   # set_target_properties Can not find target to add properties to: Threads::Threads
-  find_package(Threads)
 endif()
+  find_package(Threads)
 
 add_definitions( -DLIQUIDFUN_EXTERNAL_LANGUAGE_API=1 )
 
