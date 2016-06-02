@@ -82,7 +82,7 @@ typedef HGLRC (WINAPI * PFNWGLCREATECONTEXTATTRIBSARBPROC) (HDC hDC, HGLRC hShar
 
 #ifdef WM_TOUCH
 typedef BOOL (WINAPI *pRegisterTouchWindow)(HWND,ULONG);
-static pRegisterTouchWindow fghRegisterTouchWindow = (pRegisterTouchWindow)0xDEADBEEF;
+static pRegisterTouchWindow fghRegisterTouchWindow;
 #endif
 
 
@@ -729,8 +729,13 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
 
     /* Enable multitouch: additional flag TWF_FINETOUCH, TWF_WANTPALM */
     #ifdef WM_TOUCH
-        if (fghRegisterTouchWindow == (pRegisterTouchWindow)0xDEADBEEF) 
-			fghRegisterTouchWindow = (pRegisterTouchWindow)GetProcAddress(GetModuleHandle("user32"),"RegisterTouchWindow");
+		static bool bFoundRegisterTouch = false;
+		if (!bFoundRegisterTouch)
+		{
+			fghRegisterTouchWindow = (pRegisterTouchWindow)GetProcAddress(GetModuleHandle("user32"), "RegisterTouchWindow");
+			bFoundRegisterTouch = true;
+		}
+			
 		if (fghRegisterTouchWindow)
              fghRegisterTouchWindow( window->Window.Handle, TWF_FINETOUCH | TWF_WANTPALM );
     #endif

@@ -63,10 +63,10 @@ class RGBc {
 public:
   Byte r, g, b;
     
-  void set(Byte r,Byte g,Byte b) {this->r=r;this->g=g;this->b=b;}
+  void set(Byte pr,Byte pg,Byte pb) {this->r=pr;this->g=pg;this->b=pb;}
     
   RGBc( void ) {}
-  RGBc( Byte r, Byte g, Byte b ) { set( r, g, b ); }
+  RGBc( Byte pr, Byte pg, Byte pb ) { set( pr, pg, pb ); }
 };
 #define _RGBC_
 #endif
@@ -2021,7 +2021,7 @@ public:
     const char *get_text( void )         { return text.c_str(); }
 
     void dump( FILE *out, const char *text );
-    void set_tab_w(int w) { tab_width = w; }
+    void set_tab_w(int pw) { tab_width = pw; }
     void set_start_line(int l) { start_line = l; }
     static void scrollbar_callback(GLUI_Control*);
 

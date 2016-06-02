@@ -44,8 +44,8 @@ extern void fgPlatformCheckMenuDeactivate(HWND newFocusWnd);
 #ifdef WM_TOUCH
 typedef BOOL (WINAPI *pGetTouchInputInfo)(HTOUCHINPUT,UINT,PTOUCHINPUT,int);
 typedef BOOL (WINAPI *pCloseTouchInputHandle)(HTOUCHINPUT);
-static pGetTouchInputInfo fghGetTouchInputInfo = (pGetTouchInputInfo)0xDEADBEEF;
-static pCloseTouchInputHandle fghCloseTouchInputHandle = (pCloseTouchInputHandle)0xDEADBEEF;
+static pGetTouchInputInfo fghGetTouchInputInfo;
+static pCloseTouchInputHandle fghCloseTouchInputHandle;
 #endif
 
 #ifdef _WIN32_WCE
@@ -1525,15 +1525,17 @@ LRESULT CALLBACK fgPlatformWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 		unsigned int numInputs = (unsigned int)wParam;
 		unsigned int i = 0;
 		TOUCHINPUT* ti = (TOUCHINPUT*)malloc( sizeof(TOUCHINPUT)*numInputs);
+		static bool bFoundHandles = false;
+		if (!bFoundHandles)
+		{
+			fghGetTouchInputInfo = (pGetTouchInputInfo)GetProcAddress(GetModuleHandle("user32"), "GetTouchInputInfo");
+			fghCloseTouchInputHandle = (pCloseTouchInputHandle)GetProcAddress(GetModuleHandle("user32"), "CloseTouchInputHandle");
 
-		if (fghGetTouchInputInfo == (pGetTouchInputInfo)0xDEADBEEF) {
-		    fghGetTouchInputInfo = (pGetTouchInputInfo)GetProcAddress(GetModuleHandle("user32"),"GetTouchInputInfo");
-		    fghCloseTouchInputHandle = (pCloseTouchInputHandle)GetProcAddress(GetModuleHandle("user32"),"CloseTouchInputHandle");
-		}
-
-		if (!fghGetTouchInputInfo) { 
-			free( (void*)ti );
-			break;
+			if (!fghGetTouchInputInfo) {
+				free((void*)ti);
+				break;
+			}
+			bFoundHandles = true;
 		}
 
 		if (fghGetTouchInputInfo( (HTOUCHINPUT)lParam, numInputs, ti, sizeof(TOUCHINPUT) )) {
